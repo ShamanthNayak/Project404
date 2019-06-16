@@ -3,6 +3,9 @@ import datetime
 import wolframalpha
 import speech_recognition as sr
 import webbrowser
+import sys
+import os
+import wikipedia
 
 engine = pyttsx3.init()
 
@@ -25,7 +28,7 @@ def welcome():
         speak('Good Evening!')
     speak('I am your personal assistant')
 
-# welcome()
+welcome()
 speak('What can I do for you')
 
 def command():
@@ -38,8 +41,12 @@ def command():
         r.pause_threshold =  1
         audio = r.listen(source)
 
-    command = r.recognize_google(audio, language='en-in')
-    print('User: '+command)
+    try:
+        command = r.recognize_google(audio, language='en-in')
+        print('User: '+command)
+    except sr.UnknownValueError:
+        command()
+
 
     return command
 
@@ -48,10 +55,6 @@ if __name__=='__main__':
         task = command()
         task = task.lower()
 
-        res = client.query(task)
-        output = next(res.results).text
-        speak(output)
-
         if 'open google' in task:
             speak('Opening Google')
             webbrowser.open('www.google.com')
@@ -59,3 +62,24 @@ if __name__=='__main__':
         elif 'open youtube' in task:
             speak('Opening Youtube')
             webbrowser.open('www.youtube.com')
+        
+        elif 'quit' in task or 'bye' in task or 'abort' in task:
+            speak('Aborting')
+            sys.exit()
+        else:
+            try:
+                res = client.query(task)
+                output = next(res.results).text
+                print(output)
+                speak(output)
+            
+            except:
+                print('Searching Wikipedia')
+                speak('Searching Wikipedia')
+                res = wikipedia.summary(task ,sentences=2)
+                print(res)
+                speak(res)
+
+        speak('Next command')
+
+        
