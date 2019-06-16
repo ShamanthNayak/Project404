@@ -1,9 +1,12 @@
 import pyttsx3
 import datetime
+import wolframalpha
 import speech_recognition as sr
 import webbrowser
 
 engine = pyttsx3.init()
+
+client = wolframalpha.Client('K7K8Q9-5W2U7U8L7H')
 
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
@@ -40,10 +43,14 @@ def command():
 
     return command
 
-if __name__ == '__main__':
+if __name__=='__main__':
     while(True):
         task = command()
         task = task.lower()
+
+        res = client.query(task)
+        output = next(res.results).text
+        speak(output)
 
         if 'open google' in task:
             speak('Opening Google')
