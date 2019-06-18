@@ -5,6 +5,7 @@ import speech_recognition as sr
 import webbrowser
 import sys
 import os
+import re
 import wikipedia
 
 engine = pyttsx3.init()
@@ -53,13 +54,14 @@ while(True):
     task = command()
 
     if 'open' in task:
-        site = task.split(' ')
-        print('Kylie: Opening '+site[1])
-        speak('Opening '+site[1])
-        if '.' in site[1]:
-            webbrowser.open('https://www.'+site[1])
+        search_site = re.search('open (.*)', task)
+        site = search_site.group(1)
+        print('Kylie: Opening '+site)
+        speak('Opening '+site)
+        if '.' in site:
+            webbrowser.open('https://www.'+site)
         else:
-            webbrowser.open('https://www.'+site[1]+'.com')
+            webbrowser.open('https://www.'+site+'.com')
 
     elif 'time' in task:
         time = datetime.datetime.now()
