@@ -11,8 +11,8 @@ engine = pyttsx3.init()
 
 client = wolframalpha.Client('K7K8Q9-5W2U7U8L7H')
 
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
+# voices = engine.getProperty('voices')
+# engine.setProperty('voice', voices[2].id)
 
 def speak(msg):
     engine.say(msg)
@@ -26,14 +26,13 @@ def welcome():
         speak('Good Afternoon!')
     else:
         speak('Good Evening!')
-    speak('I am your personal assistant')
+    speak('I am your personal assistant kylie')
 
-welcome()
+# welcome()
 speak('What can I do for you')
 
 def command():
     r = sr.Recognizer()
-
     mic = sr.Microphone()
 
     with mic as source:
@@ -42,44 +41,49 @@ def command():
         audio = r.listen(source)
 
     try:
-        command = r.recognize_google(audio, language='en-in')
-        print('User: '+command)
+        mycommand = r.recognize_google(audio, language='en-in').lower()
+        print('You Said: '+mycommand)
     except sr.UnknownValueError:
-        command()
+        print('...')
+        mycommand = command()
 
+    return mycommand
 
-    return command
+while(True):
+    task = command()
 
-if __name__=='__main__':
-    while(True):
-        task = command()
-        task = task.lower()
-
-        if 'open google' in task:
-            speak('Opening Google')
-            webbrowser.open('www.google.com')
-        
-        elif 'open youtube' in task:
-            speak('Opening Youtube')
-            webbrowser.open('www.youtube.com')
-        
-        elif 'quit' in task or 'bye' in task or 'abort' in task:
-            speak('Aborting')
-            sys.exit()
+    if 'open' in task:
+        site = task.split(' ')
+        print('Kylie: Opening '+site[1])
+        speak('Opening '+site[1])
+        if '.' in site[1]:
+            webbrowser.open('https://www.'+site[1])
         else:
-            try:
-                res = client.query(task)
-                output = next(res.results).text
-                print(output)
-                speak(output)
-            
-            except:
-                print('Searching Wikipedia')
-                speak('Searching Wikipedia')
-                res = wikipedia.summary(task ,sentences=2)
-                print(res)
-                speak(res)
+            webbrowser.open('https://www.'+site[1]+'.com')
 
-        speak('Next command')
+    elif 'time' in task:
+        time = datetime.datetime.now()
+        print(f'Current time is {time.hour} Hours and {time.minute} Minutes')
+        speak(f'Current time is {time.hour} Hours and {time.minute} Minutes')
+
+    elif 'quit' in task or 'bye' in task or 'abort' in task:
+        speak('Good bye Have a nice day')
+        sys.exit()
+
+    elif 'thank you' in task:
+        speak('My pleasure')
+
+    else:
+        try:
+            res = client.query(task)
+            output = next(res.results).text
+            print(output)
+            speak(output)
+        
+        except:
+            speak('Okay')
+            res = wikipedia.summary(task ,sentences=2)
+            print(res)
+            speak(res)
 
         
