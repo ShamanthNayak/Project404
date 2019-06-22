@@ -1,12 +1,13 @@
 import pyttsx3
 import datetime
 import wolframalpha
+import wikipedia
 import speech_recognition as sr
 import webbrowser
+import subprocess
 import sys
 import os
 import re
-import wikipedia
 
 engine = pyttsx3.init()
 
@@ -20,17 +21,8 @@ def speak(msg):
     engine.runAndWait()
 
 def welcome():
-    timeHour = datetime.datetime.now().hour
-    if timeHour>0 and timeHour<12:
-        speak('Good Morning!')
-    elif timeHour>=12 and timeHour<18:
-        speak('Good Afternoon!')
-    else:
-        speak('Good Evening!')
     speak('I am your personal assistant kylie')
-
-# welcome()
-speak('What can I do for you')
+    speak('What can I do for you')
 
 def command():
     r = sr.Recognizer()
@@ -50,9 +42,11 @@ def command():
 
     return mycommand
 
+welcome()
+
 while(True):
     task = command()
-
+    
     if 'open' in task:
         search_site = re.search('open (.*)', task)
         site = search_site.group(1)
@@ -62,6 +56,26 @@ while(True):
             webbrowser.open('https://www.'+site)
         else:
             webbrowser.open('https://www.'+site+'.com')
+
+    elif 'run' in task:
+        search_app = re.search('run (.*)', task)
+        app = search_app.group(1)
+        print(app)
+        os.system(app)
+        # subprocess.Popen(["open", "-n", "/Applications/" + app], stdout=subprocess.PIPE)
+        # subprocess.Popen(app+'.exe')
+
+    elif 'hello' in task:
+        timeHour = datetime.datetime.now().hour
+        if timeHour>0 and timeHour<12:
+            speak('Hello. Good Morning!')
+            print('Kyile: Hello. Good morning!')
+        elif timeHour>=12 and timeHour<18:
+            speak('Hello. Good Afternoon!')
+            print('Kyile: Hello Good Afternoon!')
+        else:
+            speak('Hello. Good Evening!')
+            print('Kyile: Hello Good Evening!') 
 
     elif 'time' in task:
         time = datetime.datetime.now()
